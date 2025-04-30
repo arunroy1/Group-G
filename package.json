@@ -2,9 +2,9 @@
   "name": "group-g",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",  
+  "main": "app.js",
   "scripts": {
-    "start": "node app.js",  
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,7 +17,8 @@
   "bugs": {
     "url": "https://github.com/jvalencia0328/Group-G/issues"
   },
-  "homepage": "https://github.com/jvalencia0328/Group-G#readme"
+  "homepage": "https://github.com/jvalencia0328/Group-G#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
 }
-
-
