@@ -1,3 +1,5 @@
+const session     = require('express-session');
+const MongoStore  = require('connect-mongo');
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -6,6 +8,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 dotenv.config();
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'a really secret key',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
+  cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 day
+}));
 
 // Middleware
 app.use(express.json());
@@ -38,4 +48,5 @@ app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
-
+const authRoutes = require('./routes/auth');
+app.use(authRoutes);
