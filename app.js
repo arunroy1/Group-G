@@ -8,7 +8,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 dotenv.config();
-//Middleware
+//Import middlewares
+const localsMiddleware = require('./middleware/locals');
+const { handleErrors } = rquire('./middleware/error-handler');
+ = //Middleware
 app.use(session({
   secret: process.env.SESSION_SECRET || 'a really secret key',
   resave: false,
@@ -20,6 +23,9 @@ app.use(session({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//locals middleware
+app.use(localsMiddleware.setLocals);
 
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -52,6 +58,8 @@ app.use('/recipes', recipeRoutes);
 app.use('/comments', commentRoutes);
 app.use('/ratings', ratingRoutes);
 app.use('/', authRoutes);
+
+app.use(handleErrors);
 
 
 // Start server
