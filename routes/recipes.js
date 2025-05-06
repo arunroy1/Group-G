@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Recipe = require('../models/Recipe')
+const Recipe = require('../models/Recipe');
+const { isAuthenticated } = require('../middleware/auth');
 
 
 
@@ -29,7 +30,7 @@ router.get('/:id', async (req, res) => {
 
 
 // POST create recipe
-router.post('/', async (req, res) => {
+router.post('/', isAuthenticated, async (req, res) => {
   const { title, description, ingredients, instructions, tags } = req.body;
   if (!title || !description || !ingredients || !instructions) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -53,7 +54,7 @@ router.post('/', async (req, res) => {
 
 
 // PUT update recipe
-router.put('/:id', async (req, res) => {
+router.put('/:id',isAuthenticated, async (req, res) => {
   try {
     const updated = await Recipe.findByIdAndUpdate(
       req.params.id,
@@ -69,7 +70,7 @@ router.put('/:id', async (req, res) => {
 
 
 // DELETE recipe
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', isAuthenticated, async (req, res) => {
   try {
     const deleted = await Recipe.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ error: 'Recipe not found' });

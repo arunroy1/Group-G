@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Rating = require('../models/Rating'); // Adjust path as needed
-
+const { isAuthenticated} = require('../middleware/auth/');
 // GET all ratings 
 router.get('/', async (req, res) => {
   try {
@@ -31,7 +31,7 @@ router.get('/recipe/:recipeId', async (req, res) => {
 });
 
 //POST a new rating
-router.post('/', async (req, res) => {
+router.post('/', isAuthenticated, async (req, res) => {
   const { recipeId, userId, value } = req.body;
 
   if (!recipeId || !userId || value == null) {
@@ -60,7 +60,7 @@ router.post('/', async (req, res) => {
 });
 
 //DELETE a rating by ID (admin or if user wants to undo rating)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', isAuthenticated, async (req, res) => {
   try {
     const deleted = await Rating.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ error: 'Rating not found' });

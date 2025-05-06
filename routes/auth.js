@@ -4,7 +4,7 @@ const router  = express.Router();
 const User    = require('../models/User');
 
 // Serve signup form
-router.get('/signup', (req, res) => {
+router.get('/signup', isNotAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, '../views/signup.html'));
 });
 
@@ -22,7 +22,7 @@ router.post('/signup', async (req, res) => {
 });
 
 // Serve login form
-router.get('/login', (req, res) => {
+router.get('/login', isNotAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, '../views/login.html'));
 });
 

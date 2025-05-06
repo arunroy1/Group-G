@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Comment = require('../models/Comment'); // Make sure path is correct
+const { isAuthenticated } = require('../middleware/auth');
 
 // GET all comments
 router.get('/', async (req, res) => {
@@ -11,7 +12,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch comments' });
   }
 });
-
+// Get comments for a specific recipe
 router.get('/recipe/:recipeId', async (req, res) => {
     try {
       const comments = await Comment.find({ recipeId: req.params.recipeId });
@@ -22,7 +23,7 @@ router.get('/recipe/:recipeId', async (req, res) => {
   });
 
 // POST create a new comment
-router.post('/', async (req, res) => {
+router.post('/', isAuthenticated, async (req, res) => {
   const { recipeId, user, text } = req.body;
 
   if (!recipeId || !user || !text) {
@@ -38,7 +39,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',isAuthenticated, async (req, res) => {
     try {
       const deleted = await Comment.findByIdAndDelete(req.params.id);
       if (!deleted) return res.status(404).json({ error: 'Comment not found' });
