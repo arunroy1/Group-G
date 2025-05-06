@@ -8,10 +8,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 dotenv.config();
-//Import middlewares
+
+// Import middlewares
 const localsMiddleware = require('./middleware/locals');
-const { handleErrors } = rquire('./middleware/error-handler');
- = //Middleware
+const { handleErrors } = require('./middleware/error-handler'); 
+
+// Middleware
 app.use(session({
   secret: process.env.SESSION_SECRET || 'a really secret key',
   resave: false,
@@ -20,13 +22,11 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 day
 }));
 
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//locals middleware
+// Locals middleware
 app.use(localsMiddleware.setLocals);
-
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -34,9 +34,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
-
-
-
 
 // Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI, {
@@ -46,9 +43,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log(' Connected to MongoDB Atlas'))
 .catch(err => console.error(' MongoDB connection error:', err));
 
-
-
-
+// Route handlers
 const recipeRoutes = require('./routes/recipes');
 const commentRoutes = require('./routes/comment');
 const ratingRoutes = require('./routes/rating');
@@ -61,10 +56,10 @@ app.use('/', authRoutes);
 
 app.use(handleErrors);
 
-
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
 
 
