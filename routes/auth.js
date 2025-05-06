@@ -1,48 +1,24 @@
-const path = require('path');
+// routes/auth.js
+
 const express = require('express');
-const router  = express.Router();
-const User    = require('../models/User');
+const router = express.Router();
+const { isNotAuthenticated } = require('../middleware/auth');
+const authController = require('../controllers/authController');
 
-// Serve signup form
-router.get('/signup', isNotAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/signup.html'));
-});
+// GET signup form
+router.get('/signup', isNotAuthenticated, authController.getSignup);
 
-// Handle signup
-router.post('/signup', async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    const user = new User({ username, email, password });
-    await user.save();
-    req.session.userId = user._id;
-    return res.redirect('/');
-  } catch (err) {
-    return res.status(400).send('Signup error: ' + err.message);
-  }
-});
+// POST signup
+router.post('/signup', authController.postSignup);
 
-// Serve login form
-router.get('/login', isNotAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/login.html'));
-});
+// GET login form
+router.get('/login', isNotAuthenticated, authController.getLogin);
 
-// Handle login
-router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const user = await User.findOne({ username });
-  if (!user || !(await user.comparePassword(password))) {
-    return res.status(400).send('Invalid credentials');
-  }
-  req.session.userId = user._id;
-  res.redirect('/');
-});
+// POST login
+router.post('/login', authController.postLogin);
 
-// Logout
-router.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) return res.status(500).send('Logout error');
-    res.redirect('/login');
-  });
-});
+// GET logout
+router.get('/logout', authController.logout);
 
 module.exports = router;
+
