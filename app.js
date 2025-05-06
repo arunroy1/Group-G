@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 dotenv.config();
-
+//Middleware
 app.use(session({
   secret: process.env.SESSION_SECRET || 'a really secret key',
   resave: false,
@@ -17,7 +17,7 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 day
 }));
 
-// Middleware
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -29,9 +29,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Recipe routes
-const recipeRoutes = require('./routes/recipes'); 
-app.use('/api/recipes', recipeRoutes);
+
 
 
 // Connect to MongoDB Atlas
@@ -40,7 +38,20 @@ mongoose.connect(process.env.MONGODB_URI, {
   useUnifiedTopology: true
 })
 .then(() => console.log(' Connected to MongoDB Atlas'))
-.catch(err => console.error(' MongoDB connection error:', err))
+.catch(err => console.error(' MongoDB connection error:', err));
+
+
+
+
+const recipeRoutes = require('./routes/recipes');
+const commentRoutes = require('./routes/comment');
+const ratingRoutes = require('./routes/rating');
+const authRoutes = require('./routes/auth');
+
+app.use('/recipes', recipeRoutes);
+app.use('/comments', commentRoutes);
+app.use('/ratings', ratingRoutes);
+app.use('/', authRoutes);
 
 
 // Start server
@@ -48,5 +59,4 @@ app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
-const authRoutes = require('./routes/auth');
-app.use(authRoutes);
+
