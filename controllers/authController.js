@@ -14,10 +14,8 @@ exports.postSignup = async (req, res) => {
     const { username, email, password } = req.body;
     const user = new User({ username, email, password });
     await user.save();
-    req.session.user = {
-      id: user._id,
-      username: user.username
-    };
+
+    req.session.signedUp = true;
 
     return res.redirect('/');
   } catch (err) {

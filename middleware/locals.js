@@ -9,6 +9,8 @@ exports.setLocals = (req, res, next) => {
     
     // Flag to check if user is authenticated
     res.locals.isAuthenticated = !!req.session.user;
+
+    res.locals.hasSignedUp      = !!req.session.signedUp;
     
     // Add the current path for navigation highlighting
     res.locals.path = req.path;
