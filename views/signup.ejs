@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+  <!-- Inlined Navigation -->
+  <nav>
+    <ul class="navbar">
+      <li><a href="/">Home</a></li>
+      <li><a href="/recipes">Recipes</a></li>
+
+      <% if (isAuthenticated) { %>
+        <li><a href="/add-recipe">Add Recipe</a></li>
+        <li><a href="/profile">Profile</a></li>
+        <li><a href="#" class="logout-link">Log Out</a></li>
+      <% } else { %>
+        <% if (!hasSignedUp) { %>
+          <li><a href="/signup">Sign Up</a></li>
+        <% } %>
+        <li><a href="/login">Log In</a></li>
+      <% } %>
+    </ul>
+  </nav>
+
+  <main class="auth-page">
+    <h1>Sign Up</h1>
+
+    <% if (error) { %>
+      <div class="error-message">
+        <p><%= error %></p>
+        <p>Already have an account? <a href="/login">Log In</a></p>
+      </div>
+    <% } %>
+
+    <form action="/signup" method="POST" class="auth-form">
+      <label>
+        Username:
+        <input name="username" required />
+      </label>
+      <label>
+        Email:
+        <input name="email" type="email" required />
+      </label>
+      <label>
+        Password:
+        <input name="password" type="password" required />
+      </label>
+      <button type="submit">Sign Up</button>
+    </form>
+  </main>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

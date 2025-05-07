@@ -18,30 +18,30 @@
   <!-- Navigation -->
   <nav>
     <ul class="navbar">
+      <!-- always visible -->
       <li><a href="/">Home</a></li>
       <li><a href="/recipes">Recipes</a></li>
   
-      <!-- only if logged in -->
+      <!-- only when logged in -->
       <% if (isAuthenticated) { %>
         <li><a href="/add-recipe">Add Recipe</a></li>
+        <li><a href="/profile">Profile</a></li>
       <% } %>
   
-      <!-- not logged in -->
+      <!-- sign-up & login -->
       <% if (!isAuthenticated) { %>
-        <!-- only show “Sign Up” if they haven’t just signed up -->
         <% if (!hasSignedUp) { %>
           <li><a href="/signup">Sign Up</a></li>
         <% } %>
-        <!-- always let them log in -->
         <li><a href="/login">Log In</a></li>
-  
-      <!-- logged in -->
       <% } else { %>
-        <li><a href="/logout">Log Out</a></li>
+        <% if (path !== '/') { %>
+          <li><a href="#" class="logout-link">Log Out</a></li>
+        <% } %>
       <% } %>
     </ul>
-  </nav>  
-  
+  </nav>
+    
   <!-- Main Content -->
   <main>
 
@@ -82,5 +82,6 @@
     <p>&copy; 2025 Recipe Explorer</p>
   </footer>
 
+  <script src="/js/main.js"></script>
 </body>
 </html>

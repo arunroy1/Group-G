@@ -1,8 +1,6 @@
-// routes/auth.js
-
 const express = require('express');
 const router = express.Router();
-const { isNotAuthenticated } = require('../middleware/auth');
+const { isAuthenticated, isNotAuthenticated } = require('../middleware/auth');
 const authController = require('../controllers/authController');
 
 // GET signup form
@@ -20,5 +18,7 @@ router.post('/login', authController.postLogin);
 // GET logout
 router.get('/logout', authController.logout);
 
-module.exports = router;
+// GET profile page (protected)
+router.get('/profile', isAuthenticated, authController.getProfile);
 
+module.exports = router;
