@@ -14,7 +14,11 @@ exports.postSignup = async (req, res) => {
     const { username, email, password } = req.body;
     const user = new User({ username, email, password });
     await user.save();
-    req.session.userId = user._id;
+    req.session.user = {
+      id: user._id,
+      username: user.username
+    };
+
     return res.redirect('/');
   } catch (err) {
     return res.status(400).send('Signup error: ' + err.message);
@@ -33,7 +37,11 @@ exports.postLogin = async (req, res) => {
   if (!user || !(await user.comparePassword(password))) {
     return res.status(400).send('Invalid credentials');
   }
-  req.session.userId = user._id;
+  req.session.user = {
+    id: user._id,
+    username: user.username
+  };
+
   res.redirect('/');
 };
 
