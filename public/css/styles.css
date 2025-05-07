@@ -198,6 +198,19 @@ body {
     cursor: pointer;
   }  
   
+  .status {
+    margin-left: 0.5rem;
+    font-weight: bold;
+  }
+  
+  .status.available {
+    color: green;
+  }
+  
+  .status.unavailable {
+    color: red;
+  }
+  
   /* ========== Footer ========== */
   footer {
     background-color: #0f3d4c;

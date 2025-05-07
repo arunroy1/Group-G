@@ -40,8 +40,9 @@
     <form action="/signup" method="POST" class="auth-form">
       <label>
         Username:
-        <input name="username" required />
+        <input name="username" id="username-input" required />
       </label>
+      <span id="username-status" class="status"></span>
       <label>
         Email:
         <input name="email" type="email" required />
