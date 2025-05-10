@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= user.username %>'s Profile</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <h1>Profile</h1>
+    </div>
+  </header>
+
+  <!-- Navigation (only for logged-in users) -->
+  <nav>
+    <ul class="navbar">
+      <li><a href="/">Home</a></li>
+      <li><a href="/recipes">Recipes</a></li>
+      <li><a href="/add-recipe">Add Recipe</a></li>
+      <li><a href="/profile">Profile</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Profile Content -->
+  <main class="profile-page">
+    <section class="profile-info">
+      <h2>Welcome, <%= user.username %>!</h2>
+      <p>Email: <%= user.email %></p>
+    </section>
+
+    <section class="profile-recipes">
+      <h3>Your Recipes</h3>
+      <% if (recipes.length > 0) { %>
+        <ul>
+          <% recipes.forEach(recipe => { %>
+            <li>
+              <a href="/recipes/<%= recipe._id %>">
+                <%= recipe.title %>
+              </a>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p>You haven’t added any recipes yet.</p>
+      <% } %>
+    </section>
+
+    <!-- centered logout button -->
+    <div class="logout-container">
+        <a href="#" class="logout-button logout-link">Log Out</a>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Recipe Explorer</p>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>
