@@ -2,12 +2,13 @@
 
 const Rating = require('../models/Rating');
 
-// GET all ratings
+// GET all ratings (JSON)
 exports.getAllRatings = async (req, res) => {
   try {
-    const ratings = await Rating.find();
+    const ratings = await Rating.find().lean();
     res.json(ratings);
   } catch (err) {
+    console.error('getAllRatings error:', err);
     res.status(500).json({ error: 'Failed to fetch ratings' });
   }
 };
@@ -15,45 +16,41 @@ exports.getAllRatings = async (req, res) => {
 // GET average rating for a specific recipe
 exports.getAverageRating = async (req, res) => {
   try {
-    const ratings = await Rating.find({ recipeId: req.params.recipeId });
-
-    if (ratings.length === 0) {
-      return res.json({ average: 0, count: 0 });
-    }
-
-    const sum = ratings.reduce((total, r) => total + r.value, 0);
-    const average = sum / ratings.length;
-
-    res.json({ average: average.toFixed(2), count: ratings.length });
+    const ratings = await Rating.find({ recipe: req.params.recipeId }).lean();
+    const count   = ratings.length;
+    const sum     = ratings.reduce((tot, r) => tot + r.value, 0);
+    const average = count ? (sum/count).toFixed(2) : 0;
+    res.json({ average, count });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to calculate average rating' });
+    console.error('getAverageRating error:', err);
+    res.status(500).json({ error: 'Failed to fetch average rating' });
   }
 };
 
 // POST a new or updated rating
 exports.createOrUpdateRating = async (req, res) => {
-  const { recipeId, userId, value } = req.body;
+  const { recipeId, value } = req.body;
+  const userId = req.session.user.id;
 
-  if (!recipeId || !userId || value == null) {
+  if (!recipeId || value == null) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
-
   if (value < 1 || value > 5) {
-    return res.status(400).json({ error: 'Rating value must be between 1 and 5' });
+    return res.status(400).json({ error: 'Rating must be between 1 and 5' });
   }
 
   try {
-    const existing = await Rating.findOne({ recipeId, userId });
+    let existing = await Rating.findOne({ recipe: recipeId, user: userId });
     if (existing) {
       existing.value = value;
-      const updated = await existing.save();
-      return res.json(updated);
+      await existing.save();
+      return res.json(existing);
     }
-
-    const newRating = new Rating({ recipeId, userId, value });
-    const savedRating = await newRating.save();
-    res.status(201).json(savedRating);
+    const newRating = new Rating({ recipe: recipeId, user: userId, value });
+    const saved     = await newRating.save();
+    res.status(201).json(saved);
   } catch (err) {
+    console.error('createOrUpdateRating error:', err);
     res.status(500).json({ error: 'Failed to save rating' });
   }
 };
@@ -65,6 +62,7 @@ exports.deleteRating = async (req, res) => {
     if (!deleted) return res.status(404).json({ error: 'Rating not found' });
     res.json({ message: 'Rating deleted' });
   } catch (err) {
+    console.error('deleteRating error:', err);
     res.status(400).json({ error: 'Invalid rating ID' });
   }
 };

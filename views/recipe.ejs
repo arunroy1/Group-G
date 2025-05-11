@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title><%= recipe.title %> — Recipe Details</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap"
+    rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ========= Real Navigation Header ========= -->
+    <header class="header-panel">
+      <h1>Recipe Explorer</h1>
+      <nav class="nav-bar">
+        <div class="nav-item"><a href="/">Home</a></div>
+        <div class="nav-item"><a href="/recipes">Recipes</a></div>
+        <% if (isAuthenticated) { %>
+          <div class="nav-item"><a href="/recipes/addrecipe">Add Recipe</a></div>
+          <div class="nav-item"><a href="/profile">Profile</a></div>
+        <% } else { %>
+          <% if (!hasSignedUp) { %>
+            <div class="nav-item"><a href="/signup">Sign Up</a></div>
+          <% } %>
+          <div class="nav-item"><a href="/login">Log In</a></div>
+        <% } %>
+      </nav>
+    </header>
+    <!-- ========================================== -->
+
+    <main class="content-box">
+      <h2><%= recipe.title %></h2>
+      <img
+        src="<%= recipe.imageUrl || '/images/placeholder.jpg' %>"
+        alt="Image for <%= recipe.title %>"
+        class="detail-image"
+      />
+
+      <p><%= recipe.description %></p>
+
+      <h3>Ingredients</h3>
+      <ul>
+        <% recipe.ingredients.forEach(i=>{ %>
+          <li><%= i %></li>
+        <% }) %>
+      </ul>
+
+      <h3>Instructions</h3>
+      <p style="white-space: pre-line;"><%= recipe.instructions %></p>
+
+      <!-- ————— Ratings UI ————— -->
+      <section class="rating-section">
+        <p>Average Rating: <strong><%= average %></strong> / 5 
+           (<%= count %> <%= count===1?'vote':'votes' %>)</p>
+
+        <% if (isAuthenticated) { %>
+          <form id="rating-form">
+            <label>
+              Your Rating:
+              <select id="rating-select">
+                <option value="">—</option>
+                <% for(let s=1; s<=5; s++){ %>
+                <option value="<%=s%>" <%= userRating==s?'selected':'' %>><%=s%></option>
+                <% } %>
+              </select>
+            </label>
+            <button type="submit">Submit</button>
+          </form>
+        <% } else { %>
+          <p><a href="/login">Log in</a> to rate this recipe.</p>
+        <% } %>
+      </section>
+
+      <!-- ————— Comments UI ————— -->
+      <section class="comments-section">
+        <h3>Comments</h3>
+        <ul id="comments-list">
+          <% comments.forEach(c=>{ %>
+            <li>
+              <strong><%= c.user.username %></strong>
+              <span class="comment-text"><%= c.text %></span>
+              <em class="comment-date">
+                (<%= new Date(c.createdAt).toLocaleString() %>)
+              </em>
+            </li>
+          <% }) %>
+        </ul>
+
+        <% if (isAuthenticated) { %>
+          <form id="comment-form">
+            <textarea id="comment-text"
+                      placeholder="Add a comment…"
+                      rows="2" required></textarea>
+            <button type="submit">Post Comment</button>
+          </form>
+        <% } else { %>
+          <p><a href="/login">Log in</a> to leave a comment.</p>
+        <% } %>
+      </section>
+
+  <script>
+  // — Rating AJAX
+  const ratingForm = document.getElementById('rating-form');
+  if (ratingForm) {
+    ratingForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const val = parseInt(document.getElementById('rating-select').value);
+      if (!val) return alert('Please pick 1–5 stars.');
+      try {
+        const res = await fetch('/ratings', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            recipeId: '<%= recipe._id %>',
+            value: val
+          })
+        });
+        if (!res.ok) throw await res.json();
+        window.location.reload();
+      } catch(err) {
+        alert(err.error || 'Could not submit rating');
+      }
+    });
+  }
+
+  // — Comment AJAX
+  const commentForm = document.getElementById('comment-form');
+  if (commentForm) {
+    commentForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const txt = document.getElementById('comment-text').value.trim();
+      if (!txt) return;
+      try {
+        const res = await fetch('/comments', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            recipeId: '<%= recipe._id %>',
+            text: txt
+          })
+        });
+        if (!res.ok) throw await res.json();
+        const newC = await res.json();
+        // prepend new comment
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${newC.user.username}</strong>
+                        <span class="comment-text">${newC.text}</span>
+                        <em class="comment-date">(just now)</em>`;
+        document.getElementById('comments-list').prepend(li);
+        document.getElementById('comment-text').value = '';
+      } catch(err) {
+        alert(err.error || 'Could not post comment');
+      }
+    });
+  }
+  </script>
+
+    </main>
+
+    <footer class="footer">
+      &copy; 2025 Recipe Explorer
+    </footer>
+  </div>
+</body>
+</html>

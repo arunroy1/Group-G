@@ -2,86 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Recipe Explorer</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
-
-  <!-- Header -->
-  <header>
-    <div class="header-content">
+  <div class="container">
+    <header class="header-panel">
       <h1>Recipe Explorer</h1>
+      <nav class="nav-bar">
+        <div class="nav-item"><a href="/">Home</a></div>
+        <div class="nav-item"><a href="/recipes">Recipes</a></div>
+        <% if (isAuthenticated) { %>
+          <div class="nav-item"><a href="/recipes/addrecipe">Add Recipe</a></div>
+          <div class="nav-item"><a href="/profile">Profile</a></div>
+        <% } else { %>
+          <% if (!hasSignedUp) { %>
+            <div class="nav-item"><a href="/signup">Sign Up</a></div>
+          <% } %>
+          <div class="nav-item"><a href="/login">Log In</a></div>
+        <% } %>
+      </nav>
+    </header>
+
+<section class="photo-grid">
+  <% if (!recipes.length) { %>
+    <div class="content-box">
+      <p>No recipes yet. <a href="/recipes/addrecipe">Add one now!</a></p>
     </div>
-  </header>
-
-  <!-- Navigation -->
-  <nav>
-    <ul class="navbar">
-      <!-- always visible -->
-      <li><a href="/">Home</a></li>
-      <li><a href="/recipes">Recipes</a></li>
-  
-      <!-- only when logged in -->
-      <% if (isAuthenticated) { %>
-        <li><a href="/add-recipe">Add Recipe</a></li>
-        <li><a href="/profile">Profile</a></li>
-      <% } %>
-  
-      <!-- sign-up & login -->
-      <% if (!isAuthenticated) { %>
-        <% if (!hasSignedUp) { %>
-          <li><a href="/signup">Sign Up</a></li>
+  <% } else { %>
+    <% recipes.forEach(recipe => { %>
+      <div class="content-box">
+        <img
+          src="<%= recipe.imageUrl || '/images/placeholder.jpg' %>"
+          alt="Image for <%= recipe.title %>"
+          class="thumb-image"
+        />
+        <h3><%= recipe.title %></h3>
+        <% if (recipe.averageRating > 0) { %>
+          <p class="recipe-rating">
+            Rating: <%= recipe.averageRating.toFixed(2) %> / 5
+          </p>
+        <% } else { %>
+          <p class="recipe-rating">No ratings yet</p>
         <% } %>
-        <li><a href="/login">Log In</a></li>
-      <% } else { %>
-        <% if (path !== '/') { %>
-          <li><a href="#" class="logout-link">Log Out</a></li>
-        <% } %>
-      <% } %>
-    </ul>
-  </nav>
-    
-  <!-- Main Content -->
-  <main>
-
-    <!-- Intro Section -->
-    <section class="intro-section">
-      <h2>Welcome to Recipe Explorer</h2>
-      <p>
-        Browse delicious recipes shared by our community. Whether you're looking
-        for quick meals or gourmet inspiration, we've got something for every
-        taste.
-      </p>
-      <img src="" alt="Delicious Food" />
-    </section>
-
-    <!-- Featured Recipes Grid -->
-    <section class="recipe-grid">
-      <div class="recipe-card">
-        <img src="" alt="Spaghetti" />
-        <h3>Spaghetti Bolognese</h3>
-        <p>A classic Italian favorite.</p>
+        <p><%= recipe.description %></p>
+        <a href="/recipes/<%= recipe._id %>">View Details →</a>
       </div>
-      <div class="recipe-card">
-        <img src="" alt="Tacos" />
-        <h3>Street Tacos</h3>
-        <p>Authentic and packed with flavor.</p>
-      </div>
-      <div class="recipe-card">
-        <img src="" alt="Pancakes" />
-        <h3>Fluffy Pancakes</h3>
-        <p>Perfect for Sunday brunch.</p>
-      </div>
-    </section>
+    <% }) %>
+  <% } %>
+</section>
 
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2025 Recipe Explorer</p>
-  </footer>
-
-  <script src="/js/main.js"></script>
+    <footer class="footer">
+      &copy; 2025 Recipe Explorer
+    </footer>
+  </div>
 </body>
 </html>

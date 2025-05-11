@@ -236,6 +236,35 @@ body {
   .btn:hover {
     opacity: 0.9;
   }
+
+  /* ----------------------------------- */
+/*  1) Smaller grid cards on home      */
+/* ----------------------------------- */
+.photo-grid {
+  /* was minmax(280px,1fr) */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* ----------------------------------- */
+/*  2) Remove image-only hover zoom    */
+/* ----------------------------------- */
+.content-box img:hover {
+  transform: none !important;
+}
+
+/* ----------------------------------- */
+/*  3) Ensure whole card lifts on hover */
+/* ----------------------------------- */
+.content-box:hover {
+  transform: translateY(-4px) !important;
+}
+
+/* ----------------------------------- */
+/*  4) Override detail-page image zoom */
+/* ----------------------------------- */
+.detail-image:hover {
+  transform: none !important;
+}
   
   /* ========== Footer ========== */
   footer {

@@ -1,14 +1,21 @@
-const session     = require('express-session');
-const MongoStore  = require('connect-mongo');
-const express     = require('express');
-const path        = require('path');
-const mongoose    = require('mongoose');
-const dotenv      = require('dotenv');
+const fs         = require('fs');
+const path       = require('path');
+const session    = require('express-session');
+const MongoStore = require('connect-mongo');
+const express    = require('express');
+const mongoose   = require('mongoose');
+const dotenv     = require('dotenv');
 
 dotenv.config();
 
-const app   = express();
-const PORT  = process.env.PORT || 3000;
+const app  = express();
+const PORT = process.env.PORT || 3000;
+
+// ensure uploads folder exists
+const uploadDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // view engine setup
 app.set('view engine', 'ejs');
@@ -16,7 +23,10 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Import middlewares
 const localsMiddleware = require('./middleware/locals');
-const { handleErrors } = require('./middleware/error-handler'); 
+const { handleErrors } = require('./middleware/error-handler');
+
+// Models
+const Recipe = require('./models/Recipe');
 
 // Session middleware
 app.use(session({
@@ -24,7 +34,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
-  cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 day
+  cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
 app.use(express.json());
@@ -36,9 +46,38 @@ app.use(localsMiddleware.setLocals);
 // Serve static assets
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Home route now uses EJS
-app.get('/', (req, res) => {
-  res.render('index');
+// Home route now uses EJS and injects recipes
+app.get('/', async (req, res, next) => {
+  try {
+    const recipes = await Recipe.aggregate([
+      {
+        $lookup: {
+          from: 'ratings',
+          localField: '_id',
+          foreignField: 'recipe',
+          as: 'ratings'
+        }
+      },
+      {
+        $addFields: {
+          averageRating: {
+            $cond: [
+              { $gt: [{ $size: '$ratings' }, 0] },
+              { $avg: '$ratings.value' },
+              0
+            ]
+          }
+        }
+      },
+      { $sort: { averageRating: -1 } },
+      { $limit: 10 },
+      { $project: { ratings: 0 } }
+    ]);
+
+    res.render('index', { recipes });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Connect to MongoDB Atlas
@@ -46,8 +85,8 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log(' Connected to MongoDB Atlas'))
-.catch(err => console.error(' MongoDB connection error:', err));
+.then(() => console.log('Connected to MongoDB Atlas'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 // Route handlers
 const recipeRoutes  = require('./routes/recipes');

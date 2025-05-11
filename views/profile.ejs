@@ -2,63 +2,82 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><%= user.username %>'s Profile</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Your Profile</title>
+
+  <!-- Google Font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Custom Styles -->
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header-panel">
+      <h1>Your Profile</h1>
+      <nav class="nav-bar">
+        <div class="nav-item"><a href="/">Home</a></div>
+        <div class="nav-item"><a href="/recipes">Recipes</a></div>
+        <div class="nav-item"><a href="/recipes/addrecipe">Add Recipe</a></div>
+        <div class="nav-item"><a href="/profile">Profile</a></div>
+      </nav>
+    </header>
 
-  <!-- Header -->
-  <header>
-    <div class="header-content">
-      <h1>Profile</h1>
-    </div>
-  </header>
-
-  <!-- Navigation (only for logged-in users) -->
-  <nav>
-    <ul class="navbar">
-      <li><a href="/">Home</a></li>
-      <li><a href="/recipes">Recipes</a></li>
-      <li><a href="/add-recipe">Add Recipe</a></li>
-      <li><a href="/profile">Profile</a></li>
-    </ul>
-  </nav>
-
-  <!-- Main Profile Content -->
-  <main class="profile-page">
-    <section class="profile-info">
+    <!-- Profile Header & Dropdown -->
+    <div class="profile-header">
       <h2>Welcome, <%= user.username %>!</h2>
-      <p>Email: <%= user.email %></p>
-    </section>
+      <div class="dropdown">
+        <button class="dropdown-toggle" onclick="toggleAccount()">
+          Account Details ▼
+        </button>
+        <div id="accountMenu" class="dropdown-menu">
+          <p><strong>Email:</strong> <%= user.email %></p>
+          <p><strong>Password:</strong> ••••••••</p>
+        </div>
+      </div>
+    </div>
 
-    <section class="profile-recipes">
+    <!-- Recipes & Logout -->
+    <main class="content-box">
       <h3>Your Recipes</h3>
-      <% if (recipes.length > 0) { %>
+      <% if (recipes && recipes.length) { %>
         <ul>
-          <% recipes.forEach(recipe => { %>
+          <% recipes.forEach(r => { %>
             <li>
-              <a href="/recipes/<%= recipe._id %>">
-                <%= recipe.title %>
-              </a>
+              <a href="/recipes/<%= r._id %>"><%= r.title %></a>
             </li>
           <% }) %>
         </ul>
       <% } else { %>
         <p>You haven’t added any recipes yet.</p>
       <% } %>
-    </section>
 
-    <!-- centered logout button -->
-    <div class="logout-container">
-        <a href="#" class="logout-button logout-link">Log Out</a>
-    </div>
-  </main>
+      <div class="logout-container">
+        <button class="logout-button" onclick="confirmLogout()">
+          Log Out
+        </button>
+      </div>
+    </main>
 
-  <footer>
-    <p>&copy; 2025 Recipe Explorer</p>
-  </footer>
+    <!-- Footer -->
+    <footer class="footer">
+      &copy; 2025 Recipe Explorer
+    </footer>
+  </div>
 
-  <script src="/js/main.js"></script>
+  <script>
+    function toggleAccount() {
+      document.getElementById('accountMenu')
+              .classList.toggle('show');
+    }
+    function confirmLogout() {
+      if (confirm('Are you sure you want to log out?')) {
+        window.location.href = '/logout';
+      }
+    }
+  </script>
 </body>
 </html>
