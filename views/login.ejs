@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title><%= typeof title !== 'undefined' ? title : 'Login' %></title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <h1>Log In</h1>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <p class="error" style="color: red;"><%= error %></p>
+  <% } %>
+
+  <form action="/login" method="POST">
+    <label>
+      Username:
+      <input name="username" value="<%= typeof username !== 'undefined' ? username : '' %>" required>
+    </label><br>
+
+    <label>
+      Password:
+      <input name="password" type="password" required>
+    </label><br>
+
+    <button type="submit">Login</button>
+  </form>
+
+  <p>No account? <a href="/signup">Sign up</a></p>
+</body>
+</html>
