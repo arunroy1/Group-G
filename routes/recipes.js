@@ -1,24 +1,27 @@
 // routes/recipes.js
 
-const express            = require('express');
-const path               = require('path');
-const multer             = require('multer');
-const router             = express.Router();
+const express             = require('express');
+const path                = require('path');
+const multer              = require('multer');
+const router              = express.Router();
 const { isAuthenticated } = require('../middleware/auth');
-const recipesController  = require('../controllers/recipesController');
+const recipesController   = require('../controllers/recipesController');
 
 // configure multer → uploads land in public/uploads
 const upload = multer({
   dest: path.join(__dirname, '../public/uploads')
 });
 
-// JSON API: GET all
-router.get('/', recipesController.getAllRecipes);
+// 1) HTML page at GET /recipes
+router.get('/', recipesController.showAllRecipesPage);
 
-// Show Add Recipe form
+// 2) JSON API at GET /recipes/api
+router.get('/api', recipesController.getAllRecipes);
+
+// 3) Show Add Recipe form
 router.get('/addrecipe', isAuthenticated, recipesController.showAddForm);
 
-// Handle Add Recipe POST (with optional image)
+// 4) Handle Add Recipe POST
 router.post(
   '/addrecipe',
   isAuthenticated,
@@ -26,15 +29,13 @@ router.post(
   recipesController.createRecipe
 );
 
-// **NEW** Show one recipe (HTML view)
+// 5) Show one recipe (HTML)
 router.get('/:id', recipesController.showRecipe);
 
-// (You can still add JSON endpoints if you like, but this covers the UI path.)
-
-// PUT update (JSON)
+// 6) PUT update (JSON)
 router.put('/:id', isAuthenticated, recipesController.updateRecipe);
 
-// DELETE (JSON)
+// 7) DELETE (JSON)
 router.delete('/:id', isAuthenticated, recipesController.deleteRecipe);
 
 module.exports = router;

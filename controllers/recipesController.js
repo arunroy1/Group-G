@@ -2,17 +2,34 @@
 
 const Comment = require('../models/Comment');
 const Rating  = require('../models/Rating');
-const Recipe = require('../models/Recipe');
+const Recipe  = require('../models/Recipe');
 
-// showAddForm — renders the Add Recipe form
+/**
+ * Renders the “All Recipes” HTML page
+ */
+exports.showAllRecipesPage = async (req, res, next) => {
+  try {
+    // pull everything (lean for performance)
+    const recipes = await Recipe.find().lean();
+    res.render('recipes', { recipes });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * showAddForm — renders the Add Recipe form
+ */
 exports.showAddForm = (req, res) => {
   res.render('addrecipe', {
     error: null,
-    form: { title: '', description: '', ingredients: '', instructions: '', tags: '' }
+    form: { title:'', description:'', ingredients:'', instructions:'', tags:'' }
   });
 };
 
-// showRecipe — renders the “View Details” page
+/**
+ * showRecipe — renders the “View Details” page
+ */
 exports.showRecipe = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id).lean();
@@ -23,6 +40,7 @@ exports.showRecipe = async (req, res) => {
                                   .populate('user','username')
                                   .sort('-createdAt')
                                   .lean();
+
     // pull ratings
     const ratings = await Rating.find({ recipe: req.params.id }).lean();
     const count   = ratings.length;
@@ -49,21 +67,23 @@ exports.showRecipe = async (req, res) => {
   }
 };
 
-// GET all recipes (JSON)
+/**
+ * GET all recipes (JSON)
+ */
 exports.getAllRecipes = async (req, res) => {
   try {
-    const recipes = await Recipe.find();
+    const recipes = await Recipe.find().lean();
     res.json(recipes);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch recipes' });
   }
 };
 
-// createRecipe — handles form POST (with optional image upload)
+/**
+ * createRecipe — handles form POST (with optional image upload)
+ */
 exports.createRecipe = async (req, res) => {
   const { title, description, ingredients, instructions, tags } = req.body;
-
-  // required fields
   if (!title || !description || !ingredients || !instructions) {
     return res.render('addrecipe', {
       error: 'Please fill in all required fields.',
@@ -93,7 +113,9 @@ exports.createRecipe = async (req, res) => {
   }
 };
 
-// PUT update recipe
+/**
+ * PUT update recipe (JSON)
+ */
 exports.updateRecipe = async (req, res) => {
   try {
     const updated = await Recipe.findByIdAndUpdate(
@@ -108,7 +130,9 @@ exports.updateRecipe = async (req, res) => {
   }
 };
 
-// DELETE recipe
+/**
+ * DELETE recipe (JSON)
+ */
 exports.deleteRecipe = async (req, res) => {
   try {
     const deleted = await Recipe.findByIdAndDelete(req.params.id);

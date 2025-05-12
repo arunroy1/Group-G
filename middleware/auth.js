@@ -20,7 +20,7 @@ exports.isAuthenticated = (req, res, next) => {
     if (req.session) {
       req.session.returnTo = req.originalUrl; // Store the URL they were trying to access
     }
-    res.redirect('/auth/login');
+    res.redirect('login');
   };
   
   // Middleware to check if user is NOT authenticated
