@@ -19,6 +19,7 @@
         <div class="nav-item"><a href="/recipes">Recipes</a></div>
         <div class="nav-item"><a href="/recipes/addrecipe">Add Recipe</a></div>
         <div class="nav-item"><a href="/profile">Profile</a></div>
+        <div class="nav-item"><a href="/logout">Log Out</a></div>
       </nav>
     </header>
 
@@ -32,8 +33,6 @@
         <div id="accountMenu" class="dropdown-menu">
           <p><strong>Email:</strong> <%= user.email %></p>
           <p><strong>Password:</strong> ••••••••</p>
-
-          <!-- Change password button & form -->
           <button type="button" onclick="toggleChangePassword()">
             Change Password
           </button>
@@ -62,29 +61,27 @@
       </div>
     </div>
 
-    <!-- Recipes & Logout -->
+    <!-- Recipes & Delete Buttons -->
     <main class="content-box">
       <h3>Your Recipes</h3>
       <% if (recipes && recipes.length) { %>
         <ul>
           <% recipes.forEach(r => { %>
-            <li>
+            <li style="margin-bottom:0.5rem;">
               <a href="/recipes/<%= r._id %>"><%= r.title %></a>
+              <button
+                class="delete-recipe logout-button"
+                data-id="<%= r._id %>"
+                style="margin-left:1rem;"
+              >Delete</button>
             </li>
           <% }) %>
         </ul>
       <% } else { %>
         <p>You haven’t added any recipes yet.</p>
       <% } %>
-
-      <div class="logout-container">
-        <button class="logout-button" onclick="confirmLogout()">
-          Log Out
-        </button>
-      </div>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
       &copy; 2025 Recipe Explorer
     </footer>
@@ -104,11 +101,20 @@
       const input = document.getElementById('newPassword');
       input.type = input.type === 'password' ? 'text' : 'password';
     }
-    function confirmLogout() {
-      if (confirm('Are you sure you want to log out?')) {
-        window.location.href = '/logout';
-      }
-    }
+    // Delete buttons on profile page
+    document.querySelectorAll('.delete-recipe').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Delete this recipe?')) return;
+        const id = btn.dataset.id;
+        try {
+          const res = await fetch(`/recipes/${id}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error();
+          window.location.reload();
+        } catch (err) {
+          alert('Could not delete recipe.');
+        }
+      });
+    });
   </script>
 </body>
 </html>
