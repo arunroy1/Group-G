@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Your Profile</title>
-
-  <!-- Google Font -->
   <link
     href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap"
-    rel="stylesheet" />
-
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="/css/styles.css" />
+    rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/styles.css"/>
 </head>
 <body>
   <div class="container">
@@ -36,6 +32,32 @@
         <div id="accountMenu" class="dropdown-menu">
           <p><strong>Email:</strong> <%= user.email %></p>
           <p><strong>Password:</strong> ••••••••</p>
+
+          <!-- Change password button & form -->
+          <button type="button" onclick="toggleChangePassword()">
+            Change Password
+          </button>
+          <form
+            id="changePasswordForm"
+            action="/profile/password"
+            method="POST"
+            style="display:none; margin-top:1rem;"
+          >
+            <label>
+              New Password:
+              <input
+                id="newPassword"
+                type="password"
+                name="newPassword"
+                required
+                placeholder="••••••••"
+              />
+            </label>
+            <button type="button" onclick="toggleNewPassword()">
+              Show/Hide
+            </button>
+            <button type="submit">Update</button>
+          </form>
         </div>
       </div>
     </div>
@@ -72,6 +94,15 @@
     function toggleAccount() {
       document.getElementById('accountMenu')
               .classList.toggle('show');
+    }
+    function toggleChangePassword() {
+      const form = document.getElementById('changePasswordForm');
+      form.style.display =
+        form.style.display === 'none' ? 'block' : 'none';
+    }
+    function toggleNewPassword() {
+      const input = document.getElementById('newPassword');
+      input.type = input.type === 'password' ? 'text' : 'password';
     }
     function confirmLogout() {
       if (confirm('Are you sure you want to log out?')) {

@@ -1,78 +1,134 @@
 // controllers/authController.js
 
-const path = require('path');
-const User = require('../models/User');
+const User   = require('../models/User');
 const Recipe = require('../models/Recipe');
+const bcrypt = require('bcrypt');
 
-// GET profile page
-exports.getProfile = async (req, res) => {
-  try {
-
-    const dbUser = await User.findById(req.session.user.id).lean();
-
-    const recipes = await Recipe.find({ user: dbUser._id })
-                                .sort('-createdAt')
-                                .lean();
-
-    res.render('profile', { user: dbUser, recipes });
-  } catch (err) {
-    console.error('Profile load error:', err);
-    res.status(500).send('Error loading profile');
-  }
-};
-
-// GET signup form
 exports.getSignup = (req, res) => {
-  // render with no error
-  res.render('signup', { error: null });
+  res.render('signup', {
+    error: null,
+    form: { username: '', email: '' }
+  });
 };
 
-// POST handle signup
 exports.postSignup = async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    const user = new User({ username, email, password });
-    await user.save();
+  const { username, email, password } = req.body;
+  if (!username || !email || !password) {
+    return res.render('signup', {
+      error: 'Please fill in all fields.',
+      form: { username, email }
+    });
+  }
 
-    req.session.signedUp = true;
-    return res.redirect('/');
-  } catch (err) {
-    if (err.code === 11000) {
-      // Duplicate username or email
-      return res.status(400).render('signup', {
-        error: 'You already have an account. Log In to continue.'
+  try {
+    if (await User.exists({ username })) {
+      return res.render('signup', {
+        error: 'Username already taken.',
+        form: { username, email }
       });
     }
-    return res.status(400).render('signup', {
-      error: 'Signup error: ' + err.message
+
+    const hash = await bcrypt.hash(password, 10);
+    const user = new User({ username, email, password: hash });
+    await user.save();
+
+    // include email in session
+    req.session.user = {
+      id:       user._id,
+      username: user.username,
+      email:    user.email
+    };
+    res.redirect('/');
+  } catch (err) {
+    console.error(err);
+    res.render('signup', {
+      error: 'Something went wrong. Please try again.',
+      form: { username, email }
     });
   }
 };
 
-// GET login form
 exports.getLogin = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/login.html'));
+  res.render('login', {
+    error: null,
+    username: ''
+  });
 };
 
-// POST handle login
 exports.postLogin = async (req, res) => {
   const { username, password } = req.body;
-  const user = await User.findOne({ username });
-  if (!user || !(await user.comparePassword(password))) {
-    return res.status(400).send('Invalid credentials');
+  if (!username || !password) {
+    return res.render('login', {
+      error: 'Both fields are required.',
+      username
+    });
   }
-  req.session.user = {
-    id: user._id,
-    username: user.username
-  };
 
-  res.redirect('/');
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.render('login', {
+        error: 'Invalid credentials.',
+        username
+      });
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.render('login', {
+        error: 'Invalid credentials.',
+        username
+      });
+    }
+
+    req.session.user = {
+      id:       user._id,
+      username: user.username,
+      email:    user.email
+    };
+    res.redirect('/');
+  } catch (err) {
+    console.error(err);
+    res.render('login', {
+      error: 'Something went wrong.',
+      username
+    });
+  }
 };
 
-// GET logout
 exports.logout = (req, res) => {
-  req.session.destroy(err => {
-    if (err) return res.status(500).send('Logout error');
-    res.redirect('/');   // make sure this is '/' not '/login'
+  req.session.destroy(() => {
+    res.redirect('/login');
   });
+};
+
+exports.getProfile = async (req, res, next) => {
+  try {
+    const fullUser = await User.findById(req.session.user.id).lean();
+    if (!fullUser) return res.redirect('/login');
+
+    const recipes = await Recipe.find({ user: fullUser._id }).lean();
+
+    res.render('profile', {
+      user:    fullUser,   // has username & email
+      recipes              // array of their recipes
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.postPasswordUpdate = async (req, res, next) => {
+  try {
+    const { newPassword } = req.body;
+    if (!newPassword) {
+      return res.redirect('/profile');
+    }
+
+    const hash = await bcrypt.hash(newPassword, 10);
+    await User.findByIdAndUpdate(req.session.user.id, { password: hash });
+    res.redirect('/profile');
+  } catch (err) {
+    next(err);
+  }
 };

@@ -1,31 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title><%= typeof title !== 'undefined' ? title : 'Login' %></title>
-  <link rel="stylesheet" href="/css/styles.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Log In</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap"
+    rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/styles.css"/>
 </head>
 <body>
-  <h1>Log In</h1>
+  <div class="container">
+    <header class="header-panel">
+      <h1>Recipe Explorer</h1>
+      <nav class="nav-bar">
+        <div class="nav-item"><a href="/">Home</a></div>
+        <div class="nav-item"><a href="/recipes">Recipes</a></div>
+        <div class="nav-item"><a href="/signup">Sign Up</a></div>
+        <div class="nav-item"><a href="/login">Log In</a></div>
+      </nav>
+    </header>
 
-  <% if (typeof error !== 'undefined' && error) { %>
-    <p class="error" style="color: red;"><%= error %></p>
-  <% } %>
+    <main class="content-box">
+      <h2>Log In</h2>
+      <% if (error) { %>
+        <p class="error-message"><%= error %></p>
+      <% } %>
 
-  <form action="/login" method="POST">
-    <label>
-      Username:
-      <input name="username" value="<%= typeof username !== 'undefined' ? username : '' %>" required>
-    </label><br>
+      <form action="/login" method="POST" class="auth-form">
+        <label>
+          Username:
+          <input
+            type="text"
+            name="username"
+            value="<%= username %>"
+            required />
+        </label>
 
-    <label>
-      Password:
-      <input name="password" type="password" required>
-    </label><br>
+        <label>
+          Password:
+          <input
+            type="password"
+            name="password"
+            required />
+        </label>
 
-    <button type="submit">Login</button>
-  </form>
+        <button type="submit">Log In</button>
+      </form>
+    </main>
 
-  <p>No account? <a href="/signup">Sign up</a></p>
+    <footer class="footer">
+      &copy; 2025 Recipe Explorer
+    </footer>
+  </div>
 </body>
 </html>
