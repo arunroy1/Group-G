@@ -11,7 +11,7 @@
 </head>
 <body>
   <div class="container">
-    <!-- Header -->
+    <!-- Navigation Header -->
     <header class="header-panel">
       <h1>Your Profile</h1>
       <nav class="nav-bar">
@@ -23,8 +23,8 @@
       </nav>
     </header>
 
-    <!-- Profile Header & Dropdown -->
-    <div class="profile-header">
+    <!-- Account Details & Change Password -->
+    <div class="content-box">
       <h2>Welcome, <%= user.username %>!</h2>
       <div class="dropdown">
         <button class="dropdown-toggle" onclick="toggleAccount()">
@@ -61,26 +61,25 @@
       </div>
     </div>
 
-    <!-- Recipes & Delete Buttons -->
-    <main class="content-box">
+    <!-- Your Recipes (no delete) -->
+    <div class="content-box">
       <h3>Your Recipes</h3>
-      <% if (recipes && recipes.length) { %>
-        <ul>
+      <% if (recipes.length) { %>
+        <ul class="profile-recipes-list">
           <% recipes.forEach(r => { %>
-            <li style="margin-bottom:0.5rem;">
+            <li class="profile-recipe-item">
               <a href="/recipes/<%= r._id %>"><%= r.title %></a>
-              <button
-                class="delete-recipe logout-button"
-                data-id="<%= r._id %>"
-                style="margin-left:1rem;"
-              >Delete</button>
             </li>
           <% }) %>
         </ul>
       <% } else { %>
         <p>You haven’t added any recipes yet.</p>
       <% } %>
-    </main>
+
+      <button class="logout-button" onclick="confirmLogout()">
+        Log Out
+      </button>
+    </div>
 
     <footer class="footer">
       &copy; 2025 Recipe Explorer
@@ -101,20 +100,11 @@
       const input = document.getElementById('newPassword');
       input.type = input.type === 'password' ? 'text' : 'password';
     }
-    // Delete buttons on profile page
-    document.querySelectorAll('.delete-recipe').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        if (!confirm('Delete this recipe?')) return;
-        const id = btn.dataset.id;
-        try {
-          const res = await fetch(`/recipes/${id}`, { method: 'DELETE' });
-          if (!res.ok) throw new Error();
-          window.location.reload();
-        } catch (err) {
-          alert('Could not delete recipe.');
-        }
-      });
-    });
+    function confirmLogout() {
+      if (confirm('Are you sure you want to log out?')) {
+        window.location.href = '/logout';
+      }
+    }
   </script>
 </body>
 </html>
