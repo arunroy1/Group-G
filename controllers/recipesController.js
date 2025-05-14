@@ -9,7 +9,6 @@ const Recipe  = require('../models/Recipe');
  */
 exports.showAllRecipesPage = async (req, res, next) => {
   try {
-    // pull everything (lean for performance)
     const recipes = await Recipe.find().lean();
     res.render('recipes', { recipes });
   } catch (err) {
@@ -35,19 +34,16 @@ exports.showRecipe = async (req, res) => {
     const recipe = await Recipe.findById(req.params.id).lean();
     if (!recipe) return res.status(404).send('Recipe not found');
 
-    // pull comments
     const comments = await Comment.find({ recipe: req.params.id })
                                   .populate('user','username')
                                   .sort('-createdAt')
                                   .lean();
 
-    // pull ratings
     const ratings = await Rating.find({ recipe: req.params.id }).lean();
     const count   = ratings.length;
-    const sum     = ratings.reduce((tot,r) => tot + r.value, 0);
+    const sum     = ratings.reduce((tot, r) => tot + r.value, 0);
     const average = count ? (sum/count).toFixed(2) : 0;
 
-    // see if current user has rated
     let userRating = null;
     if (req.session.user) {
       const mine = ratings.find(r => String(r.user) === String(req.session.user.id));
@@ -80,7 +76,7 @@ exports.getAllRecipes = async (req, res) => {
 };
 
 /**
- * createRecipe — handles form POST (with optional image upload)
+ * createRecipe — handles form POST (with image in S3)
  */
 exports.createRecipe = async (req, res) => {
   const { title, description, ingredients, instructions, tags } = req.body;
@@ -99,7 +95,8 @@ exports.createRecipe = async (req, res) => {
       instructions,
       tags: tags ? tags.split(',').map(s => s.trim()) : [],
       user: req.session.user.id,
-      imageUrl: req.file ? `/uploads/${req.file.filename}` : undefined
+      // multer-s3 puts the public URL in .location
+      imageUrl: req.file ? req.file.location : undefined
     });
 
     await newRecipe.save();
