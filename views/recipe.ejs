@@ -110,7 +110,7 @@
       </section>
 
       <!-- ————— Delete Button ————— -->
-      <% if (isAuthenticated) { %>
+      <% if (isAuthenticated && recipe.user.toString() === user.id) { %>
         <button
           id="deleteBtn"
           class="logout-button"
@@ -190,17 +190,16 @@
     const deleteBtn = document.getElementById('deleteBtn');
     if (deleteBtn) {
       deleteBtn.addEventListener('click', async () => {
-        if (!confirm('Are you sure you want to delete this recipe?'))
-          return;
+        if (!confirm('Are you sure you want to delete this recipe?')) return;
         try {
           const res = await fetch(
             '/recipes/<%= recipe._id %>',
             { method: 'DELETE', credentials: 'include' }
           );
-          if (!res.ok) throw new Error();
+          if (!res.ok) throw await res.json();
           window.location.href = '/profile';
-        } catch {
-          alert('Could not delete recipe.');
+        } catch (err) {
+          alert(err.error || 'Could not delete recipe.');
         }
       });
     }
