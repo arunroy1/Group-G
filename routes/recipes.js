@@ -1,8 +1,7 @@
-// routes/recipes.js
-require('dotenv').config();          // load .env first
+require('dotenv').config();          
 
 const express             = require('express');
-const S3                  = require('aws-sdk/clients/s3');  // v2-only S3 client
+const S3                  = require('aws-sdk/clients/s3');  
 const multer              = require('multer');
 const multerS3            = require('multer-s3');
 const router              = express.Router();
@@ -19,12 +18,10 @@ const s3 = new S3({
 // Sanity check: must print your bucket name (or 'undefined')
 console.log('> S3_BUCKET is:', process.env.S3_BUCKET);
 
-// Configure multer → multer-s3 storage on S3
 const upload = multer({
   storage: multerS3({
     s3,
-    bucket: process.env.S3_BUCKET,   // <-- must be set in .env or Render
-    //acl: 'public-read',
+    bucket: process.env.S3_BUCKET,  
     key(req, file, cb) {
       const filename = `recipes/${Date.now()}_${file.originalname}`;
       cb(null, filename);

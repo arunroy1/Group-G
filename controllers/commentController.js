@@ -1,5 +1,3 @@
-// controllers/commentController.js
-
 const Comment = require('../models/Comment');
 
 // GET all comments (global)
@@ -8,7 +6,7 @@ exports.getAllComments = async (req, res) => {
     const comments = await Comment
       .find()
       .populate('user', 'username')
-      .populate('recipe', 'title')    // optional: include recipe title
+      .populate('recipe', 'title')
       .sort('-createdAt')
       .lean();
     res.json(comments);
@@ -36,19 +34,17 @@ exports.getCommentsByRecipe = async (req, res) => {
 // POST create a new comment
 exports.createComment = async (req, res) => {
   const { recipeId, text } = req.body;
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id;
 
-  if (!recipeId || !text) {
-    return res.status(400).json({ error: 'Missing required fields' });
+  if (!recipeId || !text || !userId) {
+    return res.status(400).json({ error: 'Missing required fields or not logged in' });
   }
 
   try {
-    const newComment = new Comment({
-      recipe: recipeId,
-      user:   userId,
-      text
-    });
-    const saved = await newComment.save();
+    const newComment = new Comment({ recipe: recipeId, user: userId, text });
+    const saved       = await newComment.save();
+
+    // populate the username before sending back
     await saved.populate('user', 'username');
     res.status(201).json(saved);
   } catch (err) {

@@ -1,5 +1,3 @@
-// controllers/authController.js
-
 const User   = require('../models/User');
 const Recipe = require('../models/Recipe');
 const bcrypt = require('bcrypt');
@@ -28,8 +26,7 @@ exports.postSignup = async (req, res) => {
       });
     }
 
-    const hash = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hash });
+    const user = new User({ username, email, password });
     await user.save();
 
     // include email in session
@@ -73,7 +70,7 @@ exports.postLogin = async (req, res) => {
       });
     }
 
-    const match = await bcrypt.compare(password, user.password);
+    const match = await user.comparePassword(password);
     if (!match) {
       return res.render('login', {
         error: 'Invalid credentials.',

@@ -1,5 +1,3 @@
-// controllers/recipesController.js
-
 const Comment = require('../models/Comment');
 const Rating  = require('../models/Rating');
 const Recipe  = require('../models/Recipe');
@@ -99,8 +97,13 @@ exports.createRecipe = async (req, res) => {
       imageUrl: req.file ? req.file.location : undefined
     });
 
-    await newRecipe.save();
+    const saved = await newRecipe.save();
+    const fullRecipe = await Recipe.findById(saved._id).lean();
+  if (!fullRecipe) {
     return res.redirect('/');
+  }
+    return res.redirect(`/recipes/${fullRecipe._id}`);
+
   } catch (err) {
     console.error('createRecipe error:', err);
     return res.render('addrecipe', {

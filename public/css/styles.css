@@ -1,6 +1,3 @@
-/* ----------------------------- */
-/*   Global Resets & Variables   */
-/* ----------------------------- */
 :root {
   --clr-bg-start:   #00796b;   /* teal */
   --clr-bg-middle:  #ffffff;   /* white */
@@ -19,9 +16,7 @@
   padding: 0;
 }
 
-/* ============================= */
 /*  Animated Gradient Background */
-/* ============================= */
 body {
   font-family: 'Raleway', Arial, sans-serif;
   color: var(--clr-text);
@@ -43,18 +38,14 @@ body {
   100% { background-position:   0% 50%; }
 }
 
-/* ----------------------------- */
 /*   Layout Helpers              */
-/* ----------------------------- */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
-/* ----------------------------- */
 /*   Header & Navigation         */
-/* ----------------------------- */
 .header-panel {
   background-color: var(--clr-header);
   color: white;
@@ -92,9 +83,7 @@ body {
   border-radius: 4px;
 }
 
-/* ----------------------------- */
 /*   Photo Grid (Home)           */
-/* ----------------------------- */
 .photo-grid {
   display: grid;
   gap: 1rem;
@@ -130,9 +119,7 @@ body {
   transform: none !important;
 }
 
-/* ----------------------------- */
 /*   Recipe Detail Image         */
-/* ----------------------------- */
 .detail-image {
   width: 100%;
   height: auto !important;
@@ -146,9 +133,7 @@ body {
   transform: none !important;
 }
 
-/* ----------------------------- */
 /*   Content & Typography        */
-/* ----------------------------- */
 .content-box h3 {
   margin: 0.5rem 0;
 }
@@ -165,9 +150,7 @@ body {
   font-weight: bold;
 }
 
-/* ----------------------------- */
 /*   Profile Page                */
-/* ----------------------------- */
 .profile-header {
   text-align: center;
   margin: 2rem 0 1rem;
@@ -220,9 +203,7 @@ body {
   font-size: 0.95rem;
 }
 
-/* ----------------------------- */
 /*   Logout Button               */
-/* ----------------------------- */
 .logout-container {
   text-align: center;
   margin-top: 2rem;
@@ -363,9 +344,7 @@ html {
   scrollbar-color: var(--clr-header) var(--clr-bg-middle);
 }
 
-/* ----------------------------- */
 /*   Footer                      */
-/* ----------------------------- */
 .footer {
   text-align: center;
   font-size: 0.9rem;

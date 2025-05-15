@@ -1,5 +1,3 @@
-// controllers/ratingController.js
-
 const Rating = require('../models/Rating');
 
 // GET all ratings (JSON)
