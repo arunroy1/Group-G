@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+  <nav>
+    <ul class="navbar">
+      <!-- always visible -->
+      <li><a href="/">Home</a></li>
+      <li><a href="/recipes">Recipes</a></li>
+
+      <!-- when logged in -->
+      <% if (isAuthenticated) { %>
+        <li><a href="/add-recipe">Add Recipe</a></li>
+        <li><a href="/profile">Profile</a></li>
+        <li><a href="#" class="logout-link">Log Out</a></li>
+      <% } else { %>
+        <!-- when not logged in -->
+        <% if (!hasSignedUp) { %>
+          <li><a href="/signup">Sign Up</a></li>
+        <% } %>
+        <li><a href="/login">Log In</a></li>
+      <% } %>
+    </ul>
+  </nav>
+
+  <!-- Error Content -->
+  <main style="max-width:600px; margin:3rem auto; text-align:center; padding:1rem;">
+    <h1><%= title %></h1>
+    <p><%= message %></p>
+
+    <% if (error && error.status) { %>
+      <p><strong>Status Code:</strong> <%= error.status %></p>
+    <% } %>
+
+    <p>
+      <a href="/" style="color:navy; text-decoration:underline;">
+        ← Back to Home
+      </a>
+    </p>
+  </main>
+
+  <footer style="text-align:center; margin-top:4rem; padding:1rem 0;">
+    &copy; <%= helpers.currentYear() %> Recipe Explorer
+  </footer>
+
+  <!-- Logout confirmation script -->
+  <script src="/js/main.js"></script>
+</body>
+</html>
